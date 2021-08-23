@@ -1,0 +1,27 @@
+Generate the JWT token :
+1.The client will 1st make a post request to the /autenticate endpoint with the user name and password passed in request body.
+2.This request now will be intercepted by filter called FilterOfJwt which extends the oncePerRequestFilter, this is a spring security configuration class with will garuntees that all the incoming request are intercepted only once.
+in this step we will check authorizationHeader is not null and has startsWith Bearer or not. if yes we will validate the token or else will thrown autenticate required error.
+
+3. After intercepting the request, it will check if the header has the JWT or not. if not we will call the generateToken() method with /autenticate mapping as it has the username details. the generateToken will get the user details 
+from the requestbody and passes it to the Authentication Manager which is a spring security configuration class, the Authentication Manager then calls the our UserDetailService class which implements the UserDetailService to get the username and password from the database with the help of overridden method loadUserByUserName with will return the userDetails if found else it will through usenotFoundException.
+4. Authentication Manager now compare the username details provided by the user and the details from the database. if Authentication is success it returns true else it returns invalid user exception.
+5. If we receive the Authentication is sucuessfull we call the generateToken(userDetails) method of jwtTokenUtil class with the userDetails to generate the token.
+6. This token is now return back to the client
+
+Validating the token:
+1.The client will make a class a our service with the JWT token in the header
+2.This API request now will be intercepted by filter called FilterOfJwt which extends the oncePerRequestFilter.  It will check if it has jwt token in the request or not if it has token then it will extract the token and gets the userdetails from the database by calling UserDetailService class which implements the UserDetailService interface.
+3. Once the it got the userDetails from the database it will validate the token if it has the right user details or not 
+in the FilterOfJwt class which extends the oncePerRequestFilter, will override the doFilterInternal method which will accepts request, response and Filter chain as arguments.
+We will now check if authorizationHeader is not null and has startsWith Bearer or not. then we will check if the username is not null.
+4.if it is validate the autentication is sucuessfull.
+5.The service will be called and gets the response back
+
+There will be a JWTFilterClass which extends the oncePerRequestFilter which will have the code to check if the request has jwt or not, if yes it will validate the token else it will thrown autenticate required error.
+There will be a JWT utility class which will have the code to extractUsername, generateToken, createToken, validateToken.
+
+in createToken we will set the issued time and setExpiration time by setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
+                .signWith(SignatureAlgorithm.HS256, SECRET_KEY).compact()
+
