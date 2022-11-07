@@ -25,3 +25,53 @@ in createToken we will set the issued time and setExpiration time by setIssuedAt
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY).compact()
 
+
+
+
+JWT :
+
+
+Jwt is a json web token, this is one of the best secure way to communicate between client and server.
+
+Advantages:
+It completely follows script less authentication mechanism, it means all the user imput or user state will never store in server memory or cokkies.
+
+Why jwt?
+In order to securely access any api from server side, we have to pass username and password, everytime we sends the request which is tedious. In order to minimize this effort, we can use jwt
+
+Add the dependecies for JWT (jjwt) and jaxb-api it is library that enables to create JWTs and also validate existing jwts
+
+If we are using java 9 then we have to use jaxb-api dependency also, as java 9 oe any newer doesn't have jaxb dependencies within the jdk.
+
+
+JWT implementation :
+Step 1: we haved to create a class utilJwt class where the JWT token is generatingToken and creatingToken by getting the username and password
+
+Step 2: Create a pojo class which accepts userName and password as Authenciation request
+
+Step3: Create a another pojo class which gives the jwt token as Authenciation response
+
+Step4: create a post method /authentication in ur controller class which accepts the input and and generates the jwt token
+
+Refer to Spring-security-jwt project in eclipse
+
+The above steps forms only jwt token, now we have to tell the spring to listen to every request which header has a Bearer token, extract the userdetails and refer if it is a valide jwt, if yes calls the method and sends the response 
+
+For this intercepting every request to validate the jwt token, filter are required.
+
+So we create a filter class, this is a filter that is going to intercept every request just once and then examine the header right so I'm going to have this intercept every request only once by extending the right filter called OncePerRequestFilter to create name for a filter that runs once per request/ This is the filter that I'm going to be extending here there's a method called doFilterInternal.
+
+Step2: 
+This method which actually does the job, this method takes a bunch of arguments which are request, response and a filter because
+it has the option of passing on to the
+next filter in the filter chain or
+actually ending the request right there
+what it needs to do is to examine the
+incoming requests for the JWT in the
+header right it's going to look at the
+right header and see if that JWT is
+valid if it finds a valid readability
+it's gonna get the user details out of
+the user detailed service and save it in
+the security context this is all that
+this filter needs 
